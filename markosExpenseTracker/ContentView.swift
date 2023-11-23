@@ -8,51 +8,51 @@
 import SwiftUI
 import SwiftData
 
+
+struct SecondView: View {
+    let name: String
+    @State private var user = User()
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        VStack {
+            Text("Second View").bold()
+            Text("Hello \(name)!")
+            
+            Divider()
+            Text("Your name is \(user.firstName) \(user.lastName)")
+            TextField("First name", text: $user.firstName)
+            TextField("Last name", text: $user.lastName)
+            
+            Button("Dismiss") {
+                dismiss()
+            }
+        }
+        Spacer()
+    }
+}
+
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    
+    @State private var showingSheet = false
+    
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
+        VStack {
+            Text("Yo man!").bold()
+            Divider()
+            Button("Show sheet") {
+                showingSheet.toggle()
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
+            .sheet(isPresented: $showingSheet, content: {
+                SecondView(name: "Marko")
+            })
         }
+        Spacer()
     }
 
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
-        }
-    }
+  
 }
 
 #Preview {
